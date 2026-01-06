@@ -94,16 +94,19 @@ if st.session_state.step == 1:
 
     for alat in alat_list:
         col1, col2 = st.columns([3, 1])
+
         with col1:
-            pilih = st.checkbox(alat)
+            pilih = st.checkbox(alat, key=f"cb_{alat}")
+
         with col2:
             jumlah = st.number_input(
-                "Jumlah",
+                f"Jumlah {alat}",
                 min_value=1,
                 step=1,
                 key=f"jml_{alat}",
                 disabled=not pilih
             )
+
         if pilih:
             alat_dipilih[alat] = jumlah
 
@@ -125,64 +128,3 @@ if st.session_state.step == 1:
                 "alat": alat_dipilih,
                 "waktu": datetime.now().strftime("%d-%m-%Y %H:%M")
             }
-            st.session_state.step = 2
-            st.rerun()
-
-# ================== STEP 2 ==================
-elif st.session_state.step == 2:
-    st.title("Konfirmasi Data Peminjaman")
-
-    d = st.session_state.data
-    st.markdown('<div class="card">', unsafe_allow_html=True)
-
-    st.write(f"**ID Peminjaman:** {d['id']}")
-    st.write(f"**Nama:** {d['nama']}")
-    st.write(f"**Kelompok:** {d['kelompok']}")
-    st.write(f"**Mata Kuliah:** {d['matkul']}")
-    st.write(f"**Judul Praktikum:** {d['judul']}")
-    st.write(f"**Tanggal:** {d['tanggal']}")
-
-    st.subheader("Daftar Alat:")
-    for alat, jml in d["alat"].items():
-        st.write(f"- {alat} ({jml} unit)")
-
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    if st.button("Lanjutkan ke Pengembalian"):
-        st.session_state.step = 3
-        st.rerun()
-
-# ================== STEP 3 ==================
-elif st.session_state.step == 3:
-    st.title("Dokumentasi Pengembalian Alat")
-
-    st.markdown('<div class="card">', unsafe_allow_html=True)
-
-    foto = st.file_uploader(
-        "Upload foto alat setelah dikembalikan",
-        type=["jpg", "jpeg", "png"]
-    )
-
-    if foto:
-        st.image(foto, use_container_width=True)
-        st.caption(f"Nama file: {foto.name}")
-
-        if st.button("Konfirmasi Pengembalian"):
-            st.session_state.step = 4
-            st.rerun()
-
-    st.markdown('</div>', unsafe_allow_html=True)
-
-# ================== STEP 4 ==================
-elif st.session_state.step == 4:
-    st.title("Pengembalian Berhasil")
-
-    with st.spinner("Memverifikasi data..."):
-        time.sleep(2)
-
-    st.success("Pengembalian alat telah diverifikasi.")
-    st.write("Silakan simpan ID peminjaman sebagai bukti.")
-
-    if st.button("Input Peminjaman Baru"):
-        st.session_state.clear()
-        st.rerun()
